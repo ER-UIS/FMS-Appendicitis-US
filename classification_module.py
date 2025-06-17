@@ -42,6 +42,7 @@ def run_classification(
     image_source_directory,
     output_directory,
     input_shape=(224, 224, 3),
+    FeatureName="",
     classes=2
 ):
    
@@ -83,7 +84,7 @@ def run_classification(
         return
 
     # Check if there is a diagnosis column
-    has_diagnosis = 'Diagnosis' in df.columns
+    has_diagnosis = FeatureName in df.columns
 
     # Get specified model weight files
     model_files = [f for f in os.listdir(model_directory) if f.endswith('.h5')]
@@ -135,7 +136,7 @@ def run_classification(
                 if row_info.empty:
                     print(f"No diagnosis info for application number {app_num} in 'Diagnosis' column, skipping.")
                     continue
-                diagnosis = row_info['Diagnosis'].values[0]
+                diagnosis = row_info[FeatureName].values[0]
 
             max_probability = 0
             max_class = None
@@ -170,7 +171,7 @@ def run_classification(
 
             results.append({
                 'App_No': app_num,
-                'Diagnosis': diagnosis if diagnosis is not None else 'None',
+                 FeatureName: diagnosis,
                 'main_class': max_class,
                 'main_class_prob': f"{max_probability:.2f}",
                 'main_class_image': max_image_name,

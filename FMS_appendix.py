@@ -76,6 +76,7 @@ def process_data_folder(data_folder):
     
     # Set the data path, using os.path.join for cross-platform compatibility
     Data_Path = os.path.join("model_appendix", data_folder)
+    FeatureName=data_folder
     modelType = InceptionResNetV2
 
     # Perform ER training first
@@ -104,8 +105,8 @@ def process_data_folder(data_folder):
     
     # Perform model training; parameters can be adjusted as needed
     trainModel(modelType, num_objects=objects_num, num_experiments=num_exp, 
-               enhance_data=True, continue_from_model=None, transfer_from_model=True, 
-               batch_size=16, show_network_summary=False)
+              enhance_data=True, continue_from_model=None, transfer_from_model=True, 
+              batch_size=16, show_network_summary=False)
     
     # Define the actual label pairs for each data directory
     label_mapping = {
@@ -139,6 +140,7 @@ def process_data_folder(data_folder):
     prob_column = prob_column_mapping.get(data_folder, "Thickening_prob")
     
     # Run the classification program. Note that the classes parameter is passed with the corresponding label pairs rather than the number 2
+
     run_classification(
         model_directory=os.path.join(Data_Path, "models"),
         model_json_path=os.path.join(Data_Path, "json", "model_class.json"),
@@ -146,6 +148,7 @@ def process_data_folder(data_folder):
         image_source_directory=os.path.join("model_appendix", "TestImage_crop"),
         output_directory=os.path.join(Data_Path, "Testresults"),
         input_shape=(224, 224, 3),
+        FeatureName=FeatureName,
         classes=labels    # Pass the label pairs, for example ["Thickening", "No thickening"]
     )
    
@@ -159,7 +162,7 @@ def process_data_folder(data_folder):
         testresults_dir=testresults_dir,
         models_dir=models_dir,
         best_model_dir=best_model_dir,
-        true_label_column=labels[0],  # For example, "Thickening" or "Presence of fecal stones"
+        true_label_column=FeatureName,  # For example, "Thickening" or "Presence of fecal stones"
         prob_column=prob_column,
         threshold=0.5
     )
@@ -171,8 +174,8 @@ if __name__ == "__main__":
     data_directories = ['AODC', 'AWC', 'BFC', 'CAE', 'CC', 'FAC', 'GAC', 'MSC', 'PFCC']
     
     # Loop through and process each directory sequentially
-   # for folder in data_directories:
-    #    process_data_folder(folder)
+    for folder in data_directories:
+        process_data_folder(folder)
     
    
     run_FusionDiagnosis(

@@ -185,7 +185,7 @@ def process_excel_file(file_path, true_label_column="AODC", prob_column=None, th
 
 def process_all_files(testresults_dir,
                       output_summary_file="SummaryStatisticsforAllClassificationResults.xlsx",
-                      true_label_column="AODC",
+                      true_label_column="",
                       prob_column=None,
                       threshold=0.5):
     """
@@ -270,7 +270,7 @@ def copy_best_model(model_file_name, models_dir, best_model_dir):
 
 
 def run_module(testresults_dir, models_dir, best_model_dir,
-               true_label_column="AODC",
+               true_label_column="",
                prob_column=None,
                threshold=0.5):
     """
@@ -359,15 +359,3 @@ def save_classification_results(image_paths, predictions, output_excel):
     df.to_excel(output_excel, index=False)
 
 
-# If you want to run the main process directly, you can add the entry point code here:
-if __name__ == "__main__":
-    # Modify the following parameters as needed
-    testresults_dir = "./test_results"
-    models_dir = "./models"
-    best_model_dir = "./best_model"
-
-    # When prob_column is not provided, it will be auto-selected based on the mapping of true_label_column
-    best_file, model_file, merged_results = run_module(testresults_dir, models_dir, best_model_dir,
-                                                       true_label_column="AODC",
-                                                       prob_column=None,
-                                                       threshold=0.5)
