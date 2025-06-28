@@ -152,47 +152,47 @@ def run_FusionDiagnosis(
         models_config = [
             {
                 "feature": "AODC",
-                "model_directory": "model_appendix/AODC/models",
+                "model_directory": "model_appendix/AODC/BestModel",
                 "model_json": "model_appendix/AODC/json"
             },
             {
                 "feature": "CC",
-                "model_directory": "model_appendix/CC/models",
+                "model_directory": "model_appendix/CC/BestModel",
                 "model_json": "model_appendix/CC/json"
             },
             {
                 "feature": "CAE",
-                "model_directory": "model_appendix/CAE/models",
+                "model_directory": "model_appendix/CAE/BestModel",
                 "model_json": "model_appendix/CAE/json"
             },
             {
                 "feature": "AWC",
-                "model_directory": "model_appendix/AWC/models",
+                "model_directory": "model_appendix/AWC/BestModel",
                 "model_json": "model_appendix/AWC/json"
             },
             {
                 "feature": "GAC",
-                "model_directory": "model_appendix/GAC/models",
+                "model_directory": "model_appendix/GAC/BestModel",
                 "model_json": "model_appendix/GAC/json"
             },
             {
                 "feature": "FAC",
-                "model_directory": "model_appendix/FAC/models",
+                "model_directory": "model_appendix/FAC/BestModel",
                 "model_json": "model_appendix/FAC/json"
             },
             {
                 "feature": "PFCC",
-                "model_directory": "model_appendix/PFCC/models",
+                "model_directory": "model_appendix/PFCC/BestModel",
                 "model_json": "model_appendix/PFCC/json"
             },
             {
                 "feature": "MSC",
-                "model_directory": "model_appendix/MSC/models",
+                "model_directory": "model_appendix/MSC/BestModel",
                 "model_json": "model_appendix/MSC/json"
             },
             {
                 "feature": "BFC",
-                "model_directory": "model_appendix/BFC/models",
+                "model_directory": "model_appendix/BFC/BestModel",
                 "model_json": "model_appendix/BFC/json"
             }
         ]
