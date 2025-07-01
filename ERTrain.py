@@ -139,8 +139,7 @@ def trainModel(modelType, num_objects, num_experiments, enhance_data=False, batc
                               write_images=False)
     
     if enhance_data:
-        print("Using Enhanced Data Generation")
-
+      
     height_shift = 0.1 if enhance_data else 0
     width_shift = 0.1 if enhance_data else 0
 
@@ -154,7 +153,6 @@ def trainModel(modelType, num_objects, num_experiments, enhance_data=False, batc
     test_datagen = ImageDataGenerator(
         rescale=1. / 255
     )
-
     train_generator = train_datagen.flow_from_directory(DATASET_TRAIN_DIR, 
                                                         target_size=(training_image_size, training_image_size),
                                                         batch_size=batch_size,
@@ -182,5 +180,6 @@ def trainModel(modelType, num_objects, num_experiments, enhance_data=False, batc
     model.fit_generator(train_generator, steps_per_epoch=int(num_train / batch_size), epochs=num_epochs,
                             validation_data=test_generator,
                             validation_steps=int(num_test / batch_size), callbacks=[checkpoint,tensorboard,lr_scheduler, early_stopping])
+       
       
 
