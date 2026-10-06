@@ -1,0 +1,158 @@
+{
+  "_comment": "The nine sonographic features of the appendiceal ultrasound structured report. 'positive' is the label treated as the positive class (the finding present); 'negative' is its complement. Chinese labels are those used in the original annotation spreadsheets; English labels are those used in the shared data files.",
+  "features": [
+    {
+      "code": "AODC",
+      "name": "Appendiceal outer diameter characteristics",
+      "short": "Appendiceal outer diameter",
+      "positive": "Thickening",
+      "negative": "No thickening",
+      "zh_column": "阑尾外径",
+      "zh_positive": "增粗",
+      "zh_negative": "无增粗",
+      "shap_weight": 8.8576
+    },
+    {
+      "code": "CC",
+      "name": "Characteristics of coprolites",
+      "short": "Coprolite",
+      "positive": "Presence of fecal stones",
+      "negative": "No fecal stones",
+      "zh_column": "粪石",
+      "zh_positive": "有粪石",
+      "zh_negative": "无粪石",
+      "shap_weight": 0.1896
+    },
+    {
+      "code": "CAE",
+      "name": "Characteristics of abdominal effusion",
+      "short": "Abdominal effusion",
+      "positive": "Presence of fluid accumulation",
+      "negative": "No fluid accumulation",
+      "zh_column": "腹腔积液",
+      "zh_positive": "有积液",
+      "zh_negative": "无积液",
+      "shap_weight": 0.052
+    },
+    {
+      "code": "AWC",
+      "name": "Appendiceal wall condition",
+      "short": "Appendiceal wall condition",
+      "positive": "Abnormal appendix wall",
+      "negative": "Continuous appendix wall",
+      "zh_column": "阑尾壁情况",
+      "zh_positive": "阑尾壁异常",
+      "zh_negative": "阑尾壁连续",
+      "shap_weight": 0.6157,
+      "deployable": false,
+      "note": "Withheld from automated output: AUC 0.305 against the original reports (inverted ranking); flagged for mandatory human review."
+    },
+    {
+      "code": "GAC",
+      "name": "Gas accumulation in the appendiceal cavity",
+      "short": "Intraluminal gas",
+      "positive": "Presence of gas accumulation",
+      "negative": "No gas accumulation",
+      "zh_column": "阑尾腔内积气",
+      "zh_positive": "有积气",
+      "zh_negative": "无积气",
+      "shap_weight": 0.9146
+    },
+    {
+      "code": "FAC",
+      "name": "Fluid accumulation in the appendiceal cavity",
+      "short": "Intraluminal fluid",
+      "positive": "Presence of fluid accumulation",
+      "negative": "No fluid accumulation",
+      "zh_column": "阑尾腔内积液",
+      "zh_positive": "有积液",
+      "zh_negative": "无积液",
+      "shap_weight": 0.6324
+    },
+    {
+      "code": "PFCC",
+      "name": "Periappendiceal fluid collection",
+      "short": "Periappendiceal fluid",
+      "positive": "Presence of fluid accumulation",
+      "negative": "No fluid accumulation",
+      "zh_column": "阑尾周边积液",
+      "zh_positive": "有积液",
+      "zh_negative": "无积液",
+      "shap_weight": 0.7151
+    },
+    {
+      "code": "MSC",
+      "name": "Mesentery surrounding the appendix",
+      "short": "Mesenteric swelling",
+      "positive": "Presence of swelling",
+      "negative": "No swelling",
+      "zh_column": "阑尾周围系膜",
+      "zh_positive": "有肿胀",
+      "zh_negative": "无肿胀",
+      "shap_weight": 0.0
+    },
+    {
+      "code": "BFC",
+      "name": "Blood flow characteristics of the appendiceal region",
+      "short": "Regional blood flow",
+      "positive": "Presence of blood flow",
+      "negative": "No blood flow",
+      "zh_column": "阑尾区血流",
+      "zh_positive": "有血流",
+      "zh_negative": "无血流",
+      "shap_weight": 0.8113
+    }
+  ],
+  "comprehensive_index_weights": {
+    "accuracy": 0.3,
+    "f1": 0.4,
+    "auc": 0.3
+  },
+  "report_thresholds": {
+    "substandard": 4,
+    "discarded": 6
+  },
+  "deployed_checkpoints": {
+    "_comment": "Epoch of the snapshot deployed under each selection strategy in the published analysis (eTable 2 in Supplement 1).",
+    "FMO": {
+      "AODC": 14,
+      "CC": 41,
+      "CAE": 4,
+      "AWC": 4,
+      "GAC": 9,
+      "FAC": 9,
+      "PFCC": 9,
+      "MSC": 46,
+      "BFC": 4
+    },
+    "ESO": {
+      "AODC": 14,
+      "CC": 46,
+      "CAE": 22,
+      "AWC": 57,
+      "GAC": 25,
+      "FAC": 31,
+      "PFCC": 40,
+      "MSC": 25,
+      "BFC": 26
+    },
+    "NO": {
+      "AODC": 89,
+      "CC": 80,
+      "CAE": 22,
+      "AWC": 57,
+      "GAC": 41,
+      "FAC": 63,
+      "PFCC": 75,
+      "MSC": 59,
+      "BFC": 72
+    }
+  },
+  "seeds": {
+    "_comment": "Seeds used in the published analyses. Model training in the original study did not fix a seed (single training run; see Limitations); scripts/01_train.py fixes one for new runs.",
+    "training_default": 2026,
+    "patient_level_bootstrap": 2026,
+    "selection_set_bootstrap": 20260930,
+    "medcalc_auc_bootstrap": 978
+  }
+}
