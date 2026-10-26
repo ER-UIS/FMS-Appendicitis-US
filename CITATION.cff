@@ -1,9 +1,14 @@
 cff-version: 1.2.0
 message: "If you use this code, please cite the accompanying article and this repository."
-title: "FMS-Appendicitis-US: feature-specific checkpoint selection for automated quality review of appendiceal ultrasound reports"
-version: 2.0.0
-date-released: 2026-10-07
+title: "FMS-Appendicitis-US: deep learning feature reports as a drafting assistant for single-operator appendiceal ultrasound"
+version: 2.1.0
+date-released: 2026-10-26
+license: MIT
 repository-code: "https://github.com/ER-UIS/FMS-Appendicitis-US"
 authors:
   - name: "The FMS-Appendicitis-US study group (Changsha Central Hospital, University of South China, and collaborating hospitals)"
-keywords: [appendicitis, ultrasound, deep learning, structured reporting, checkpoint selection, quality control]
+keywords: [appendicitis, ultrasound, deep learning, structured reporting, reference standard, checkpoint selection]
+references:
+  - type: dataset
+    title: "Dataset and supplementary data for this study"
+    doi: "10.6084/m9.figshare.29222042"
