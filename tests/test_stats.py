@@ -51,7 +51,10 @@ def test_fmo_eso_no_selection():
     preds = {ep: pd.DataFrame({"y": y, "p": np.clip(y * 0.5 + rng.random(184) * 0.5 + (0.1 if ep == 7 else 0), 0, 1)}) for ep in range(1, 21)}
     sc = select.score_checkpoints(preds)
     assert select.no_epoch(sc) == 20 and select.fmo_epoch(sc) in sc.index
-    assert select.eso_epoch([0.5, 0.6, 0.7, 0.65, 0.64] + [0.6] * 10, patience=10) == 3
+    assert select.eso_val_epoch([0.5, 0.6, 0.7, 0.65, 0.64] + [0.6] * 10, patience=10) == 3
+    assert select.eso_epoch([1, 2, 3, 4, 5, 6, 7, 13, 14, 33, 43, 44, 49, 55, 61, 62, 65, 89]) == 14   # AODC
+    assert select.eso_epoch([1, 2, 3, 4, 7, 9, 11, 21, 22]) == 22                                     # CAE (run ended first)
+    assert select.eso_epoch([1, 2, 3, 4, 5, 8, 9, 11, 15, 25, 41]) == 25                              # GAC
     mc = select.monte_carlo_weights(sc, 500, 1)
     assert 0 <= mc["top1_rate"] <= 1
 

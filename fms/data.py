@@ -11,8 +11,8 @@ Two spreadsheet layouts occur:
 2. *Checkpoint prediction tables* written by :mod:`fms.predict` (one file per
    checkpoint): columns ``App_No``, ``<CODE>`` (reference label, if known),
    ``pred`` (predicted label), ``p_pos`` (positive-class probability of the
-   max-pooled image), ``p_neg``, ``image`` (name of the image that produced
-   the maximum) and ``epoch``.
+   image with the most confident prediction), ``p_neg``, ``image`` (name of
+   that image) and ``epoch``.
 """
 from __future__ import annotations
 import os
@@ -38,6 +38,8 @@ def _normalise_columns(df: pd.DataFrame) -> pd.DataFrame:
             ren[c] = BY_ZH[c].code
         elif c in _ID_ALIASES and c != ID_COL:
             ren[c] = ID_COL
+        elif c.startswith(("label_", "expert_")) and c.split("_", 1)[1] in BY_CODE:   # figshare 01_labels CSV files
+            ren[c] = c.split("_", 1)[1]
         else:
             base = c.replace("_correct", "")
             if base in BY_ZH:
@@ -50,13 +52,17 @@ def _normalise_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def read_labels(path: str, codes: Iterable[str] = CODES) -> pd.DataFrame:
-    """Read a label table; returns a DataFrame indexed by App_No with English labels."""
-    df = _normalise_columns(pd.read_excel(path))
+    """Read a label table (Excel, or the CSV files of the figshare record with 0/1 coding);
+    returns a DataFrame indexed by App_No with English labels."""
+    raw = pd.read_csv(path, dtype=str) if str(path).lower().endswith(".csv") else pd.read_excel(path)
+    df = _normalise_columns(raw)
     df = df.set_index(ID_COL)
     out = pd.DataFrame(index=df.index)
     for code in codes:
         if code in df.columns:
-            out[code] = df[code].astype(str).str.strip().map(lambda v, c=code: to_english(v, c))
+            f = BY_CODE[code]
+            out[code] = df[code].astype(str).str.strip().map(
+                lambda v, c=code, f=f: f.positive if v in ("1", "1.0") else (f.negative if v in ("0", "0.0") else to_english(v, c)))
     return out
 
 

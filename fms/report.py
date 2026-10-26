@@ -27,7 +27,7 @@ def discrepancies(report: pd.DataFrame, reference: pd.DataFrame, codes: Iterable
 
 def threshold_table(reports: Dict[str, pd.DataFrame], reference: pd.DataFrame, codes: Iterable[str] = CODES,
                     kmax: int = 8, comparisons: Optional[List[tuple]] = None) -> pd.DataFrame:
-    """Table 2 / eTable 9 / eTable 13: proportion of reports with >= k discrepancies.
+    """Table 4 and Supplementary Tables 4, 13 and 15: proportion of reports with >= k discrepancies.
 
     `reports`: strategy name -> boolean report DataFrame on the same patients.
     `comparisons`: list of (a, b) strategy pairs for patient-matched McNemar P
@@ -76,7 +76,7 @@ def endpoint_summary(reports: Dict[str, pd.DataFrame], reference: pd.DataFrame, 
 
 def alerts(report: pd.DataFrame, original: pd.DataFrame, expert: pd.DataFrame,
            codes: Iterable[str] = DEPLOYABLE) -> pd.DataFrame:
-    """Second-reader analysis (eTable 10, Part C).
+    """Second-reader analysis (earlier versions of this work; not reported in the accompanying article).
 
     An *alert* is a feature on which the automated report disagrees with the
     original clinical report; it is *true* if the expert majority agrees with
@@ -105,7 +105,7 @@ def alerts(report: pd.DataFrame, original: pd.DataFrame, expert: pd.DataFrame,
 
 
 def quality_score(report: pd.DataFrame, reference: pd.DataFrame, weights: Dict[str, float]) -> pd.Series:
-    """SHAP-weighted 0-100 report-quality score (eMethods 2; a within-study construct)."""
+    """SHAP-weighted 0-100 report-quality score (earlier versions of this work; not reported in the accompanying article)."""
     codes = list(weights)
     w = np.array([weights[c] for c in codes], float)
     correct = (report[codes].astype(bool).values == reference.loc[report.index, codes].astype(bool).values)

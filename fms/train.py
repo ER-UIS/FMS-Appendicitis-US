@@ -9,14 +9,18 @@ Reproduces the training set-up of the study:
 * A *snapshot* is saved whenever training accuracy improves
   (``ModelCheckpoint(monitor='accuracy', save_best_only=True)``), producing the
   candidate checkpoint pool used by FMO.
-* The validation data are the images of the expert-verified model-selection
-  cohort (n = 184); the three early-stopping rules of eTable 3 monitor
-  validation accuracy on that cohort (ESO = static, patience 10).
+* Each feature's annotations were split randomly by image 80:20 into training
+  (``train/``) and validation (``test/``) portions.  The validation portion only
+  monitors accuracy; it is the validation set of the two separate
+  validation-based early-stopping runs (ESO2, ESO3 of Table 4 and Supplementary Table 18).  ESO itself
+  uses training accuracy (patience 10) within the pool-producing run, and the
+  expert-verified model-selection cohort (n = 184) is used only to score the
+  snapshots for FMO (``scripts/02_predict_checkpoints.py``).
 
 Directory layout expected under ``--data-root`` (default ``model_appendix``)::
 
     <root>/<CODE>/train/<class label>/*.jpg     training images
-    <root>/<CODE>/test/<class label>/*.jpg      model-selection cohort images
+    <root>/<CODE>/test/<class label>/*.jpg      validation images (20% image-level split)
     <root>/<CODE>/models/                       snapshots (written)
     <root>/<CODE>/json/model_class.json         class index -> label (written)
     <root>/<CODE>/logs/                         training log (written)
@@ -62,41 +66,50 @@ def build_model(num_classes: int = 2, image_size: int = 224, weights: Optional[s
     return models.Model(inputs=base.input, outputs=out)
 
 
+class EarlyStoppingAtAccuracy:
+    """Stopping rule of the pool-producing run (``ERTrain.py``): stop at the first epoch
+    whose *training* accuracy reaches `target` (1.0)."""
+
+    def __new__(cls, target=1.0):
+        import tensorflow as tf
+
+        class _CB(tf.keras.callbacks.Callback):
+            def on_epoch_end(self, epoch, logs=None):
+                v = (logs or {}).get("accuracy")
+                if v is not None and v >= target:
+                    self.model.stop_training = True
+        return _CB()
+
+
 class EarlyStoppingDynamic:
-    """ESO2 of eTable 3: stop when val_accuracy has failed a decaying threshold
-    for `patience` consecutive epochs (threshold starts at `initial` and is
-    multiplied by `decay` each epoch); the best epoch is restored."""
+    """ESO3 of Table 4 and Supplementary Table 18 (the authors' ``EarlyStoppingDynamicThreshold``
+    callback): early stopping on ``val_accuracy`` with `patience` epochs and an *improvement
+    floor* -- ``best`` starts at `initial` (0.9), so an epoch counts as an improvement only
+    when val_accuracy exceeds max(initial, best so far).  The original callback also printed
+    a threshold multiplied by `decay` (0.98) after each non-improving epoch; that value
+    never entered the stopping decision and is kept here only for the log line.  The
+    deployed checkpoint of such a run is the epoch with the highest val_accuracy
+    (``ModelCheckpoint(monitor='val_accuracy', save_best_only=True)``)."""
 
     def __new__(cls, initial=0.9, decay=0.98, patience=10):
         import tensorflow as tf
 
         class _CB(tf.keras.callbacks.Callback):
             def on_train_begin(self, logs=None):
-                self.thr, self.fails, self.best, self.best_w = initial, 0, -np.inf, None
+                self.best, self.thr, self.wait, self.best_w = initial, initial, 0, None
 
             def on_epoch_end(self, epoch, logs=None):
-                v = (logs or {}).get("val_accuracy", 0.0)
+                v = (logs or {}).get("val_accuracy")
+                if v is None:
+                    return
                 if v > self.best:
-                    self.best, self.best_w = v, self.model.get_weights()
-                self.fails = 0 if v >= self.thr else self.fails + 1
-                self.thr *= decay
-                if self.fails >= patience:
-                    self.model.stop_training = True
-                    if self.best_w is not None:
-                        self.model.set_weights(self.best_w)
-        return _CB()
-
-
-class EarlyStoppingTarget:
-    """ESO3 of eTable 3: stop at the first epoch whose val_accuracy reaches `target`."""
-
-    def __new__(cls, target=0.95):
-        import tensorflow as tf
-
-        class _CB(tf.keras.callbacks.Callback):
-            def on_epoch_end(self, epoch, logs=None):
-                if (logs or {}).get("val_accuracy", 0.0) >= target:
-                    self.model.stop_training = True
+                    self.best, self.wait, self.thr, self.best_w = v, 0, initial, self.model.get_weights()
+                else:
+                    self.wait += 1; self.thr *= decay
+                    if self.wait >= patience:
+                        self.model.stop_training = True
+                        if self.best_w is not None:
+                            self.model.set_weights(self.best_w)
         return _CB()
 
 
@@ -106,11 +119,13 @@ def train_feature(code: str, data_root: str = "model_appendix", epochs: int = 10
                   pretrained: Optional[str] = "imagenet") -> str:
     """Train the classifier of feature `code`; returns the snapshot directory.
 
-    `early_stopping`: 'none' (save all improving snapshots; FMO/NO choose
-    afterwards), 'static' (ESO: val_accuracy, patience), 'dynamic' (ESO2) or
-    'target' (ESO3).  With 'none' the run produces the checkpoint pool from
-    which FMO, ESO and NO are selected offline (see :mod:`fms.select`), so a
-    single training run serves all three strategies, as in the study.
+    `early_stopping`: 'none' (save all improving snapshots, stop when training
+    accuracy reaches 100%; FMO, ESO and NO are then chosen offline from the
+    pool, see :mod:`fms.select`, so a single run serves all three strategies as
+    in the study), 'static' (ESO2 run of Table 4 and Supplementary Table 18: ``keras.callbacks.EarlyStopping``
+    on val_accuracy, patience 10, best-val_accuracy checkpoint) or 'dynamic'
+    (ESO3 run of Table 4 and Supplementary Table 18: the authors' dynamic-threshold callback, see
+    :class:`EarlyStoppingDynamic`).
     """
     import tensorflow as tf
     from tensorflow.keras.callbacks import CSVLogger, EarlyStopping, ModelCheckpoint
@@ -152,10 +167,10 @@ def train_feature(code: str, data_root: str = "model_appendix", epochs: int = 10
         callbacks.append(EarlyStopping(monitor="val_accuracy", patience=patience, restore_best_weights=True, verbose=1))
     elif early_stopping == "dynamic":
         callbacks.append(EarlyStoppingDynamic(patience=patience))
-    elif early_stopping == "target":
-        callbacks.append(EarlyStoppingTarget())
-    elif early_stopping != "none":
-        raise ValueError("early_stopping must be none|static|dynamic|target")
+    elif early_stopping == "none":
+        callbacks.append(EarlyStoppingAtAccuracy())
+    else:
+        raise ValueError("early_stopping must be none|static|dynamic")
 
     model.fit(train, epochs=epochs, validation_data=val, callbacks=callbacks, verbose=1)
     with open(os.path.join(d_logs, f"run_{stamp}.json"), "w") as f:

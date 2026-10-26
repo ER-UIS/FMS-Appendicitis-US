@@ -17,7 +17,7 @@ p.add_argument("--batch-size", type=int, default=16)
 p.add_argument("--image-size", type=int, default=224)
 p.add_argument("--lr", type=float, default=1e-3)
 p.add_argument("--seed", type=int, default=2026)
-p.add_argument("--early-stopping", choices=["none", "static", "dynamic", "target"], default="none",
+p.add_argument("--early-stopping", choices=["none", "static", "dynamic"], default="none",
                help="none = save all improving snapshots (FMO/NO pool); static = ESO (val_accuracy, patience 10)")
 p.add_argument("--patience", type=int, default=10)
 p.add_argument("--no-augment", action="store_true")

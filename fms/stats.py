@@ -1,4 +1,4 @@
-"""Statistical procedures used in the paper (eMethods 2 in Supplement 1).
+"""Statistical procedures used in the paper (Methods, Statistical analysis).
 
 All functions are pure numpy/scipy and operate on boolean or numeric arrays.
 
@@ -197,7 +197,7 @@ def bootstrap_ci(stat: Callable[[np.ndarray], float], n: int, B: int = 2000, see
 
 
 def format_p(p: float) -> str:
-    """JAMA-style P value formatting."""
+    """P value formatting (no leading zero; <.001; >.99)."""
     if p != p:
         return "NA"
     if p < 0.001:

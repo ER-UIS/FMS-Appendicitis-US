@@ -1,4 +1,4 @@
-"""Post hoc threshold recalibration of the deployed checkpoints (eMethods 4; eTable 20).
+"""Post hoc threshold recalibration of the deployed checkpoints (earlier versions of this work; not reported in the accompanying article).
 
 Example
     python scripts/07_recalibration.py --selection-root results/selection --test-root results/test3214 \

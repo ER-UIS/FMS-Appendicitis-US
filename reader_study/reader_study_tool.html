@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阑尾超声报告草稿阅读实验</title>
+<script src="manifest.js"></script>
+<style>
+  :root{--bg:#f6f7f9;--card:#fff;--ink:#1a1a1a;--muted:#5b6470;--line:#e2e5ea;--blue:#2a78d6;--orange:#eb6834;--green:#1baf7a;--red:#c0392b}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+  header{background:#fff;border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;font-weight:600}
+  .pill{padding:3px 10px;border-radius:999px;font-size:13px;background:#eef3fb;color:var(--blue)}
+  .pill.with{background:#fdeee8;color:var(--orange)} .pill.without{background:#eaf7f1;color:var(--green)}
+  main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(360px,1fr);gap:16px;padding:16px 20px;max-width:1500px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+  .imgs img{width:100%;border-radius:6px;cursor:zoom-in;background:#000}
+  .big{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:50}
+  .big img{max-width:98vw;max-height:98vh}
+  table.f{width:100%;border-collapse:collapse}
+  table.f td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.f td.n{width:34%;color:var(--ink)}
+  label.opt{display:inline-flex;align-items:center;gap:4px;margin-right:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);cursor:pointer}
+  label.opt.sel{border-color:var(--blue);background:#eef3fb}
+  tr.changed td{background:#fff8f2}
+  .draftTag{font-size:12px;color:var(--orange);margin-left:6px}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{font:inherit;padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer}
+  button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+  button.warn{background:#fff;color:var(--red);border-color:var(--red)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .muted{color:var(--muted);font-size:13px}
+  textarea{width:100%;min-height:54px;font:inherit;border:1px solid var(--line);border-radius:6px;padding:6px}
+  #login{max-width:560px;margin:60px auto;padding:24px}
+  input[type=text]{font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;width:100%}
+  .timer{font-variant-numeric:tabular-nums;color:var(--muted)}
+  .done{background:#eaf7f1;border-color:#bfe8d5}
+</style>
+</head>
+<body>
+<header>
+  <h1>阑尾超声报告草稿阅读实验</h1>
+  <span id="who" class="pill"></span>
+  <span id="prog" class="pill"></span>
+  <span id="cond" class="pill"></span>
+  <span id="timer" class="timer"></span>
+  <span style="flex:1"></span>
+  <button id="exportBtn" onclick="exportCSV()">导出结果 CSV</button>
+</header>
+
+<div id="login" class="card">
+  <h2 style="margin-top:0">开始前</h2>
+  <p>请输入阅读者编号（由研究负责人分配：<b>R1</b> 或 <b>R2</b>）和您的姓名缩写。本工具会把每例的用时和填写结果保存在本机浏览器中，并可随时导出。</p>
+  <p><input type="text" id="readerId" placeholder="阅读者编号，例如 R1"></p>
+  <p><input type="text" id="readerName" placeholder="姓名缩写，例如 ZM"></p>
+  <p class="muted">说明：每例显示该次检查存储的全部阑尾区图像。部分病例会同时显示 AI 生成的报告草稿（8 项特征），请按您的判断<b>直接采纳</b>、<b>修改后采纳</b>或<b>重写</b>；另一部分病例不显示草稿，请直接填写 8 项特征。请连续完成，不要查阅病历、病理或原报告。每例从显示到提交的时间会自动记录，期间请勿暂停或离开。</p>
+  <button class="primary" onclick="start()">开始</button>
+</div>
+
+<main id="main" style="display:none">
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <b id="caseTitle"></b><span class="muted" id="imgCount"></span>
+    </div>
+    <div class="imgs" id="imgs"></div>
+  </section>
+  <section class="card" id="form">
+    <div id="draftNote" class="muted" style="margin-bottom:8px"></div>
+    <table class="f" id="ftable"></table>
+    <div style="margin-top:10px"><textarea id="note" placeholder="备注（可选）：例如图像质量不足、无法判断某项"></textarea></div>
+    <div class="btns">
+      <button id="adoptBtn" class="primary" onclick="submit('adopt')">直接采纳草稿</button>
+      <button id="rewriteBtn" class="warn" onclick="rewrite()">重写（清空草稿）</button>
+      <button id="submitBtn" class="primary" onclick="submit()">提交本例</button>
+    </div>
+    <p class="muted" id="hint"></p>
+  </section>
+</main>
+
+<div class="big" id="big" onclick="this.style.display='none'"><img id="bigimg"></div>
+
+<script>
+const FEATURES = [
+  ['AODC','阑尾外径',['无增粗','增粗']],
+  ['CC','粪石',['无粪石','有粪石']],
+  ['CAE','腹腔积液',['无积液','有积液']],
+  ['GAC','阑尾腔内积气',['无积气','有积气']],
+  ['FAC','阑尾腔内积液',['无积液','有积液']],
+  ['PFCC','阑尾周边积液',['无积液','有积液']],
+  ['MSC','阑尾周围系膜',['无肿胀','有肿胀']],
+  ['BFC','阑尾区血流',['无血流','有血流']],
+];
+let reader=null, name=null, idx=0, t0=null, rewritten=false, results=[], tick=null;
+const KEY = () => 'appx_reader_'+reader;
+
+function start(){
+  reader = document.getElementById('readerId').value.trim().toUpperCase();
+  name = document.getElementById('readerName').value.trim();
+  if(!(reader in MANIFEST.readers)){ alert('阅读者编号必须是 R1 或 R2'); return; }
+  if(!name){ alert('请输入姓名缩写'); return; }
+  try{ const saved = JSON.parse(localStorage.getItem(KEY())||'null'); if(saved){ results = saved.results||[]; } }catch(e){ results=[]; }
+  idx = results.length;
+  document.getElementById('login').style.display='none';
+  document.getElementById('main').style.display='grid';
+  document.getElementById('who').textContent = reader+' · '+name;
+  show();
+}
+function condOf(c){ return MANIFEST.readers[reader][c.block]; }
+function show(){
+  const cases = MANIFEST.cases;
+  if(idx>=cases.length){ finish(); return; }
+  const c = cases[idx]; const cond = condOf(c); rewritten=false;
+  document.getElementById('prog').textContent = `第 ${idx+1} / ${cases.length} 例`;
+  document.getElementById('cond').textContent = cond==='with' ? '本例有 AI 草稿' : '本例无草稿';
+  document.getElementById('cond').className = 'pill '+cond;
+  document.getElementById('caseTitle').textContent = `病例 ${c.order}（${c.id}）`;
+  document.getElementById('imgCount').textContent = `${c.images.length} 张图像，点击放大`;
+  const ig = document.getElementById('imgs'); ig.innerHTML='';
+  c.images.forEach(f=>{ const im=document.createElement('img'); im.src=`images/${c.id}/${f}`; im.onclick=()=>{document.getElementById('bigimg').src=im.src; document.getElementById('big').style.display='flex';}; ig.appendChild(im); });
+  const tb = document.getElementById('ftable'); tb.innerHTML='';
+  FEATURES.forEach(([code,zh,opts])=>{
+    const tr=document.createElement('tr'); tr.id='row_'+code;
+    const pre = cond==='with' ? c.draft[code] : null;
+    tr.innerHTML = `<td class="n">${zh}${cond==='with'?'<span class="draftTag">草稿：'+opts[pre]+'</span>':''}</td><td>`+
+      opts.map((o,v)=>`<label class="opt ${pre===v?'sel':''}"><input type="radio" name="f_${code}" value="${v}" ${pre===v?'checked':''} onchange="onChange('${code}',${v})"> ${o}</label>`).join('')+`</td>`;
+    tb.appendChild(tr);
+  });
+  document.getElementById('note').value='';
+  document.getElementById('draftNote').innerHTML = cond==='with' ? '下面是 AI 根据存储图像生成的<b>报告草稿</b>。若完全同意请点“直接采纳草稿”；若需改动个别项目，直接改选后点“提交本例”；若认为草稿基本不可用，点“重写”清空后重新填写。' : '本例<b>不显示草稿</b>，请根据图像填写 8 项特征后提交。';
+  document.getElementById('adoptBtn').style.display = cond==='with' ? '' : 'none';
+  document.getElementById('rewriteBtn').style.display = cond==='with' ? '' : 'none';
+  document.getElementById('adoptBtn').disabled=false;
+  document.getElementById('hint').textContent='';
+  t0 = performance.now(); if(tick) clearInterval(tick);
+  tick = setInterval(()=>{ document.getElementById('timer').textContent = '用时 '+((performance.now()-t0)/1000).toFixed(0)+' s'; }, 500);
+  window.scrollTo(0,0);
+}
+function onChange(code,v){
+  const c=MANIFEST.cases[idx]; const cond=condOf(c);
+  const tr=document.getElementById('row_'+code);
+  tr.querySelectorAll('label.opt').forEach(l=>l.classList.toggle('sel', l.querySelector('input').checked));
+  if(cond==='with'){ const changed = (c.draft[code]!==v); tr.classList.toggle('changed', changed && !rewritten);
+    const any = FEATURES.some(([k])=>{ const r=document.querySelector(`input[name=f_${k}]:checked`); return !r || parseInt(r.value)!==c.draft[k]; });
+    document.getElementById('adoptBtn').disabled = any || rewritten; }
+}
+function rewrite(){
+  rewritten=true; FEATURES.forEach(([k])=>{ document.querySelectorAll(`input[name=f_${k}]`).forEach(r=>r.checked=false); document.getElementById('row_'+k).classList.remove('changed'); document.querySelectorAll(`#row_${k} label.opt`).forEach(l=>l.classList.remove('sel')); });
+  document.getElementById('adoptBtn').disabled=true; document.getElementById('hint').textContent='已清空草稿，请重新填写全部 8 项后提交。';
+}
+function submit(mode){
+  const c=MANIFEST.cases[idx]; const cond=condOf(c); const vals={};
+  for(const [k] of FEATURES){ const r=document.querySelector(`input[name=f_${k}]:checked`); if(!r){ alert('请填写全部 8 项特征'); return; } vals[k]=parseInt(r.value); }
+  const secs = (performance.now()-t0)/1000;
+  let decision='none', nchanged=0;
+  if(cond==='with'){ nchanged = FEATURES.filter(([k])=>vals[k]!==c.draft[k]).length;
+    decision = rewritten ? 'rewrite' : (nchanged===0 ? 'adopt' : 'edit'); }
+  const row = {reader, name, order:c.order, case_id:c.id, block:c.block, condition:cond, decision, n_changed:nchanged, seconds:Math.round(secs*10)/10,
+    note:document.getElementById('note').value.replace(/[\r\n,]/g,' '), timestamp:new Date().toISOString()};
+  FEATURES.forEach(([k])=>{ row['final_'+k]=vals[k]; row['draft_'+k]= cond==='with'? c.draft[k] : ''; });
+  results.push(row); localStorage.setItem(KEY(), JSON.stringify({results}));
+  idx++; show();
+}
+function finish(){
+  clearInterval(tick); document.getElementById('timer').textContent='';
+  document.getElementById('main').innerHTML = '<section class="card done" style="grid-column:1/-1"><h2>全部 60 例已完成，谢谢！</h2><p>请点击右上角“导出结果 CSV”，把文件发给研究负责人。结果同时保存在本机浏览器中。</p></section>';
+}
+function exportCSV(){
+  if(!results.length){ alert('还没有可导出的结果'); return; }
+  const cols = Object.keys(results[0]);
+  const csv = '﻿' + cols.join(',') + '\n' + results.map(r=>cols.map(k=>String(r[k]??'')).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download=`阅读实验_${reader}_${name}_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+}
+</script>
+</body>
+</html>

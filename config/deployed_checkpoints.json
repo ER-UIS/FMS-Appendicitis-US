@@ -1,0 +1,238 @@
+{
+  "dataset": "Deep learning feature reports as a drafting assistant for single-operator appendiceal ultrasound — deployed FMO checkpoints (manifest)",
+  "weights_availability": "The nine weight files are available from the corresponding authors on request; they are not part of the figshare record (https://doi.org/10.6084/m9.figshare.29222042), which holds the images, labels and predictions. MD5 sums below identify the released files.",
+  "code": "https://github.com/ER-UIS/FMS-Appendicitis-US (v2.1.0 or later; notebooks/inference_demo.ipynb)",
+  "format": "Keras HDF5 weights-only files (model.save_weights); rebuild the architecture, then load_weights",
+  "architecture": "InceptionResNetV2 (ImageNet transfer), include_top=False, pooling='avg', followed by Dense(2, activation='softmax', use_bias=True); layer names input_1 ... conv_7b, global_average_pooling2d, dense",
+  "input": {
+    "size": [
+      224,
+      224,
+      3
+    ],
+    "preprocessing": "load image as RGB, resize to 224x224, scale pixel values to [0,1] (x/255); no mean subtraction",
+    "framework": "Keras 2 (standalone keras or tensorflow.keras 2.x)"
+  },
+  "patient_level_rule": "For each feature, score every diagnostic-quality image of the patient; the patient-level class is the class of the single most confident image-level prediction (maximum softmax probability over all images and both classes), and the feature is present if that class is the positive class; the positive-class probability of that image is recorded as the patient-level score (used for AUC). This is not the maximum of the positive-class probability over images (Methods, Patient-level aggregation; notebooks/inference_demo.ipynb, predict_feature)",
+  "selection": "FMO = feature-specific checkpoint selection on the 184-patient model-selection cohort (comprehensive index); epochs as in Supplementary Table 2",
+  "file_size_bytes": 219050360,
+  "checkpoints": [
+    {
+      "index": 1,
+      "feature_code": "AODC",
+      "feature": "Appendiceal outer diameter",
+      "feature_full_name": "Appendiceal outer diameter characteristics",
+      "weights_file": "FMO_01_AODC_epoch014_weights.h5",
+      "md5": "8b53f85a27e0aa7d1e41c7de5f533e62",
+      "class_labels_file": "FMO_01_AODC_classes.json",
+      "class_labels_zh_file": "FMO_01_AODC_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "Thickening",
+        "1": "No thickening"
+      },
+      "class_index_to_label_zh": {
+        "0": "增粗",
+        "1": "无增粗"
+      },
+      "positive_class_index": 0,
+      "positive_label": "Thickening",
+      "deployed_epoch": 14,
+      "training_accuracy_at_epoch": 0.986708,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-014_acc-0.986708.h5",
+      "deployable": true
+    },
+    {
+      "index": 2,
+      "feature_code": "CC",
+      "feature": "Coprolite",
+      "feature_full_name": "Characteristics of coprolites",
+      "weights_file": "FMO_02_CC_epoch041_weights.h5",
+      "md5": "5f03fe165d9c67c867e16d1ce7290873",
+      "class_labels_file": "FMO_02_CC_classes.json",
+      "class_labels_zh_file": "FMO_02_CC_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "No fecal stones",
+        "1": "Presence of fecal stones"
+      },
+      "class_index_to_label_zh": {
+        "0": "无粪石",
+        "1": "有粪石"
+      },
+      "positive_class_index": 1,
+      "positive_label": "Presence of fecal stones",
+      "deployed_epoch": 41,
+      "training_accuracy_at_epoch": 0.992481,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-041_acc-0.992481.h5",
+      "deployable": true
+    },
+    {
+      "index": 3,
+      "feature_code": "CAE",
+      "feature": "Abdominal effusion",
+      "feature_full_name": "Characteristics of abdominal effusion",
+      "weights_file": "FMO_03_CAE_epoch004_weights.h5",
+      "md5": "dd880e6ed35452e306920c069e81c4fb",
+      "class_labels_file": "FMO_03_CAE_classes.json",
+      "class_labels_zh_file": "FMO_03_CAE_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "No fluid accumulation",
+        "1": "Presence of fluid accumulation"
+      },
+      "class_index_to_label_zh": {
+        "0": "无积液",
+        "1": "有积液"
+      },
+      "positive_class_index": 1,
+      "positive_label": "Presence of fluid accumulation",
+      "deployed_epoch": 4,
+      "training_accuracy_at_epoch": 0.972152,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-004_acc-0.972152.h5",
+      "deployable": true
+    },
+    {
+      "index": 4,
+      "feature_code": "AWC",
+      "feature": "Appendiceal wall condition",
+      "feature_full_name": "Appendiceal wall condition",
+      "weights_file": "FMO_04_AWC_epoch004_weights.h5",
+      "md5": "f4682c1d06e0a3cc1c3ca3010fcf83d8",
+      "class_labels_file": "FMO_04_AWC_classes.json",
+      "class_labels_zh_file": "FMO_04_AWC_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "Abnormal appendix wall",
+        "1": "Continuous appendix wall"
+      },
+      "class_index_to_label_zh": {
+        "0": "阑尾壁异常",
+        "1": "阑尾壁连续"
+      },
+      "positive_class_index": 0,
+      "positive_label": "Abnormal appendix wall",
+      "deployed_epoch": 4,
+      "training_accuracy_at_epoch": 0.862971,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-004_acc-0.862971.h5",
+      "deployable": false,
+      "note": "Withheld from automated clinical output: AUC 0.305 against the original reports in the internal test cohort (inverted ranking). Released for research reproduction only."
+    },
+    {
+      "index": 5,
+      "feature_code": "GAC",
+      "feature": "Intraluminal gas",
+      "feature_full_name": "Gas accumulation in the appendiceal cavity",
+      "weights_file": "FMO_05_GAC_epoch009_weights.h5",
+      "md5": "e1c9b7e3f2beb6ebd472fabdedcc56bb",
+      "class_labels_file": "FMO_05_GAC_classes.json",
+      "class_labels_zh_file": "FMO_05_GAC_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "No gas accumulation",
+        "1": "Presence of gas accumulation"
+      },
+      "class_index_to_label_zh": {
+        "0": "无积气",
+        "1": "有积气"
+      },
+      "positive_class_index": 1,
+      "positive_label": "Presence of gas accumulation",
+      "deployed_epoch": 9,
+      "training_accuracy_at_epoch": 0.956608,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-009_acc-0.956608.h5",
+      "deployable": true
+    },
+    {
+      "index": 6,
+      "feature_code": "FAC",
+      "feature": "Intraluminal fluid",
+      "feature_full_name": "Fluid accumulation in the appendiceal cavity",
+      "weights_file": "FMO_06_FAC_epoch009_weights.h5",
+      "md5": "36a7d6803b95f3c2ec61750ff225bdf9",
+      "class_labels_file": "FMO_06_FAC_classes.json",
+      "class_labels_zh_file": "FMO_06_FAC_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "No fluid accumulation",
+        "1": "Presence of fluid accumulation"
+      },
+      "class_index_to_label_zh": {
+        "0": "无积液",
+        "1": "有积液"
+      },
+      "positive_class_index": 1,
+      "positive_label": "Presence of fluid accumulation",
+      "deployed_epoch": 9,
+      "training_accuracy_at_epoch": 0.919261,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-009_acc-0.919261.h5",
+      "deployable": true
+    },
+    {
+      "index": 7,
+      "feature_code": "PFCC",
+      "feature": "Periappendiceal fluid",
+      "feature_full_name": "Periappendiceal fluid collection",
+      "weights_file": "FMO_07_PFCC_epoch009_weights.h5",
+      "md5": "7e0c887f16386ac7928e1698a7383ed3",
+      "class_labels_file": "FMO_07_PFCC_classes.json",
+      "class_labels_zh_file": "FMO_07_PFCC_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "No fluid accumulation",
+        "1": "Presence of fluid accumulation"
+      },
+      "class_index_to_label_zh": {
+        "0": "无积液",
+        "1": "有积液"
+      },
+      "positive_class_index": 1,
+      "positive_label": "Presence of fluid accumulation",
+      "deployed_epoch": 9,
+      "training_accuracy_at_epoch": 0.927218,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-009_acc-0.927218.h5",
+      "deployable": true
+    },
+    {
+      "index": 8,
+      "feature_code": "MSC",
+      "feature": "Mesenteric swelling",
+      "feature_full_name": "Mesentery surrounding the appendix",
+      "weights_file": "FMO_08_MSC_epoch046_weights.h5",
+      "md5": "eecb9beb8d272686ab92568a481c14e1",
+      "class_labels_file": "FMO_08_MSC_classes.json",
+      "class_labels_zh_file": "FMO_08_MSC_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "No swelling",
+        "1": "Presence of swelling"
+      },
+      "class_index_to_label_zh": {
+        "0": "无肿胀",
+        "1": "有肿胀"
+      },
+      "positive_class_index": 1,
+      "positive_label": "Presence of swelling",
+      "deployed_epoch": 46,
+      "training_accuracy_at_epoch": 0.998928,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-046_acc-0.998928.h5",
+      "deployable": true
+    },
+    {
+      "index": 9,
+      "feature_code": "BFC",
+      "feature": "Regional blood flow",
+      "feature_full_name": "Blood flow characteristics of the appendiceal region",
+      "weights_file": "FMO_09_BFC_epoch004_weights.h5",
+      "md5": "600b589c34f6ea925a27e2a2eca7b1ab",
+      "class_labels_file": "FMO_09_BFC_classes.json",
+      "class_labels_zh_file": "FMO_09_BFC_model_class_zh.json",
+      "class_index_to_label": {
+        "0": "No blood flow",
+        "1": "Presence of blood flow"
+      },
+      "class_index_to_label_zh": {
+        "0": "无血流",
+        "1": "有血流"
+      },
+      "positive_class_index": 1,
+      "positive_label": "Presence of blood flow",
+      "deployed_epoch": 4,
+      "training_accuracy_at_epoch": 0.923933,
+      "original_filename": "InceptionResNetV2-imagenet-transfer-ERmodel_ex-004_acc-0.923933.h5",
+      "deployable": true
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-"""Post hoc threshold recalibration (eMethods 4; eTable 20).
+"""Post hoc threshold recalibration (earlier versions of this work; not reported in the accompanying article).
 
 For a deployed checkpoint, the decision threshold is chosen on the
 model-selection cohort as the value on a 0.01-0.99 grid maximizing the

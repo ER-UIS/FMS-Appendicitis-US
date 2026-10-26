@@ -1,4 +1,4 @@
-"""Selection-set bootstrap (eMethods 4; eTables 18-19; eFigure 7).
+"""Selection-set bootstrap (Supplementary Table 7 and Supplementary Fig. 3).
 
 Example
     python scripts/08_selection_bootstrap.py --pred-root results/selection --B 1000 --out results/etable18.xlsx

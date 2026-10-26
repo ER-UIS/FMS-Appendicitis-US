@@ -1,7 +1,7 @@
-"""Expert-reference analyses (eTable 10 / eTable 15): substandard rates against the
+"""Expert-reference analyses (Table 2 and Supplementary Tables 6, 13 and 17): substandard rates against the
 panel majority, pooled feature-level accuracy / sensitivity / specificity with
 patient-level bootstrap CIs and the cluster-adjusted McNemar test, and the
-second-reader (alert) analysis.
+second-reader (alert) analysis (the latter from earlier versions of this work; not reported in the accompanying article).
 
 Example
     python scripts/06_expert_cohorts.py --expert data/expert_majority_300.xlsx \
@@ -32,7 +32,7 @@ reports = {k: v.loc[ids] for k, v in load_reports(a.reports).items()}
 primary = next(iter(reports))
 sheets = {"thresholds_9f": threshold_table(reports, expert, CODES), "end_points_9f": endpoint_summary(reports, expert, CODES, primary),
           "thresholds_8f": threshold_table(reports, expert, DEPLOYABLE), "end_points_8f": endpoint_summary(reports, expert, DEPLOYABLE, primary)}
-# pooled feature-level metrics (eTable 15, Part A/C)
+# pooled feature-level metrics (Supplementary Table 17)
 G = expert[CODES].values; n = len(ids); rows = []
 Cp = (reports[primary][CODES].values == G)
 for name, rep in reports.items():

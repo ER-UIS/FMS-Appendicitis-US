@@ -113,7 +113,7 @@
     "discarded": 6
   },
   "deployed_checkpoints": {
-    "_comment": "Epoch of the snapshot deployed under each selection strategy in the published analysis (eTable 2 in Supplement 1).",
+    "_comment": "Epoch of the snapshot deployed under each selection strategy in the published analysis (Supplementary Table 2).",
     "FMO": {
       "AODC": 14,
       "CC": 41,
@@ -149,10 +149,18 @@
     }
   },
   "seeds": {
-    "_comment": "Seeds used in the published analyses. Model training in the original study did not fix a seed (single training run; see Limitations); scripts/01_train.py fixes one for new runs.",
+    "_comment": "Seeds used in the published analyses. The deployed (primary) training run did not fix a seed; the five post hoc retraining runs (retraining/, Supplementary Table 20) used seeds 1-5; scripts/01_train.py fixes a seed for new runs. The per-feature bootstrap CIs of Supplementary Table 2 (1000 resamples) were computed without a fixed seed.",
     "training_default": 2026,
     "patient_level_bootstrap": 2026,
     "selection_set_bootstrap": 20260930,
-    "medcalc_auc_bootstrap": 978
+    "per_feature_ci_bootstrap": null,
+    "retraining_runs": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "reader_study_case_sampling": 20261024
   }
 }

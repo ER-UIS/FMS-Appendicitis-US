@@ -1,4 +1,4 @@
-"""Selection-set bootstrap (eMethods 4; eTables 18-19; eFigure 7).
+"""Selection-set bootstrap (Supplementary Table 7 and Supplementary Fig. 3).
 
 The model-selection cohort (n = 184) is resampled with replacement B times;
 in each replicate the FMO rule is re-applied to every saved checkpoint of a
@@ -62,7 +62,7 @@ def feature_bootstrap(preds: Dict[int, pd.DataFrame], B: int = 1000, seed: int =
 
 def joint_bootstrap(preds_by_feature: Dict[str, Dict[int, pd.DataFrame]], B: int = 1000,
                     seed: int = 20260930, threshold: float = 0.5) -> pd.DataFrame:
-    """Joint re-selection of all nine checkpoints per replicate (eTable 19).
+    """Joint re-selection of all nine checkpoints per replicate (Supplementary Table 7).
 
     All features share the same patient resample in each replicate.  Returns a
     DataFrame (B x features) of selected epochs.

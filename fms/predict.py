@@ -1,8 +1,9 @@
-"""Checkpoint inference with image-to-patient aggregation (eMethods 1).
+"""Checkpoint inference with image-to-patient aggregation (Methods, Patient-level aggregation).
 
 For a patient with images i = 1..m, each image is scored by the classifier and
-the patient-level prediction is the class with the highest probability across
-all images (max-pooling); the probability of that image is recorded.  One
+the patient-level prediction is the class of the single most confident
+image-level prediction (maximum softmax probability over all images and both
+classes); the positive-class probability of that image is recorded.  One
 prediction table per checkpoint is written as
 ``<out>/<CODE>_ex-<epoch>.xlsx`` with columns App_No, <CODE> (reference label
 if available), pred, p_pos, p_neg, image, epoch.

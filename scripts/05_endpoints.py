@@ -1,10 +1,10 @@
-"""Table 2 / eTable 9 / eTable 13: discrepancy thresholds and the study end points.
+"""Table 4 and Supplementary Tables 4, 13 and 15: discrepancy thresholds and the study end points.
 
 Example
     python scripts/05_endpoints.py --reference data/Test_data_3214.xlsx \
         --reports FMO=results/reports_FMO_3214.xlsx,ESO=results/reports_ESO_3214.xlsx,NO=results/reports_NO_3214.xlsx \
         --out results/table2.xlsx
-Add --deployable to restrict to the 8 deployable features (eTable 9).
+Add --deployable to restrict to the 8 deployable features (Supplementary Table 4).
 """
 import argparse
 import pandas as pd
